@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect } from "react";
-import {  Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/navbar";
 import Home from "./pages/home";
 import { AnimatePresence } from "framer-motion";
+
 export const UserContext = createContext();
 function App() {
   const location = useLocation();

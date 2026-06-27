@@ -1,80 +1,82 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Layout, Menu } from "antd";
-import {
-  UserOutlined,
-  SolutionOutlined,
-  ReadOutlined,
-  BuildOutlined,
-  MailOutlined,
-} from "@ant-design/icons";
+import { Menu, Drawer, Button } from "antd";
+import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
+import { UserContext } from "../App";
+import "../App.css";
 
-const { Header, Content } = Layout;
+const NAV_ITEMS = [
+  { key: "about", label: "About" },
+  { key: "journey", label: "Journey" },
+  { key: "skills", label: "Skills & Values" },
+  { key: "contact", label: "Contact" },
+];
 
 function Navbar() {
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+  const { isMobile } = useContext(UserContext);
+  const [open, setOpen] = useState(false);
+
+  const goTo = (key) => {
+    setOpen(false);
+    const el = document.getElementById(key);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  const menuItems = [
-    { key: "hero", label: "Home", icon: <UserOutlined /> },
-    { key: "about", label: "About Me", icon: <SolutionOutlined /> },
-    { key: "journey", label: "Experience & Education", icon: <ReadOutlined /> },
-    { key: "skills", label: "Skills & Values", icon: <BuildOutlined /> },
-    { key: "contact", label: "Contact", icon: <MailOutlined /> },
-  ];
+  const menuItems = NAV_ITEMS.map((item) => ({
+    key: item.key,
+    label: item.label,
+    onClick: () => goTo(item.key),
+  }));
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#fbfbfb" }}>
-      <Header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "#ffffff",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-          padding: "0 24px",
-        }}
-      >
-        <div
-          className="logo"
-          style={{
-            fontWeight: 700,
-            fontSize: "18px",
-            color: "#1890ff",
-            letterSpacing: "0.5px",
-            cursor: "pointer",
-          }}
-          onClick={() => scrollToSection("hero")}
-        >
-          ANN NJERI MAINA
-        </div>
-        <Menu
-          mode="horizontal"
-          disabledOverflow
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            borderBottom: "none",
-          }}
-          items={menuItems.map((item) => ({
-            ...item,
-            onClick: () => scrollToSection(item.key),
-          }))}
-        />
-      </Header>
+    <>
+      <header className="anm-navbar">
+        <div className="anm-navbar-inner">
+          <div className="anm-brand" onClick={() => goTo("hero")}>
+            Ann Njeri <span>Maina</span>
+          </div>
 
-      <Content style={{ width: "100%" }}>
+          {!isMobile && (
+            <Menu
+              mode="horizontal"
+              items={menuItems}
+              selectable={false}
+              className="anm-navmenu"
+            />
+          )}
+
+          {isMobile && (
+            <Button
+              type="text"
+              className="anm-nav-toggle"
+              icon={<MenuOutlined />}
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+            />
+          )}
+        </div>
+      </header>
+
+      <Drawer
+        placement="right"
+        open={open}
+        onClose={() => setOpen(false)}
+        closeIcon={<CloseOutlined />}
+        title="Menu"
+        width={260}
+      >
+        <Menu
+          mode="vertical"
+          items={menuItems}
+          selectable={false}
+          style={{ border: "none" }}
+        />
+      </Drawer>
+
+      <main className="anm-page">
         <Outlet />
-      </Content>
-    </Layout>
+      </main>
+    </>
   );
 }
 
